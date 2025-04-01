@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-r from-gray-200 to-indigo-200 screen flex items-center justify-center p-3">
+    <div class="max-w-md w-full bg-white rounded-xl shadow-2xl shadow-black overflow-hidden">
+        <!-- Profile Header -->
+        <div class="p-6 text-center">
+            <h1 class="text-2xl font-bold text-black">Profile Information</h1>
+        </div>
+        
+        <!-- Profile Content -->
+        <div class="p-6">
+            <!-- Profile Image -->
+            <div class="flex justify-center mb-6">
+                <div class="relative">
+                    <img id="profileImage" src="https://via.placeholder.com/150" alt="Profile" 
+                         class="w-32 h-32 rounded-full border-4 border-white shadow-lg">
+                    <!-- <button id="editImageBtn" class="absolute bottom-0 right-0 bg-indigo-400 text-white rounded-full p-2 hover:bg-indigo-400 transition">
+                        <i class="fas fa-camera"></i>
+                    </button> -->
+                </div>
+            </div>
+            
+            <!-- Profile Details -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-1">Full Name</label>
+                    <div id="nameDisplay" class="text-gray-900 font-medium p-2 bg-gray-50 rounded"></div>
+                    <input id="nameInput" type="text" class="hidden w-full p-2 border rounded" value="">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-1">Email</label>
+                    <div id="emailDisplay" class="text-gray-900 font-medium p-2 bg-gray-50 rounded"></div>
+                    <input id="emailInput" type="email" class="hidden w-full p-2 border rounded" value="">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-1">Role</label>
+                    <div id="roleDisplay" class="text-gray-900 font-medium p-2 bg-gray-50 rounded">User</div>
+                    <!-- <select id="roleInput" class="hidden w-full p-2 border rounded">
+                        <option value="Admin">Admin</option>
+                        <option value="Moderator">Moderator</option>
+                        <option value="Master">Master</option>
+                        <option value="User">User</option>
+                    </select> -->
+                </div>
+            </div>
+            
+            <!-- Action Buttons
+            <div class="mt-8 flex justify-between">
+                <button id="editBtn" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded transition">
+                    Edit Profile
+                </button>
+                <button id="saveBtn" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition">
+                    Save Changes
+                </button>
+                <button id="cancelBtn" class="hidden bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const editBtn = document.getElementById('editBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const editImageBtn = document.getElementById('editImageBtn');
+            
+            // Display elements
+            const nameDisplay = document.getElementById('nameDisplay');
+            const emailDisplay = document.getElementById('emailDisplay');
+            // const roleDisplay = document.getElementById('roleDisplay');
+            
+            // Input elements
+            const nameInput = document.getElementById('nameInput');
+            const emailInput = document.getElementById('emailInput');
+            // const roleInput = document.getElementById('roleInput');
+            const profileImage = document.getElementById('profileImage');
+            
+            // Toggle edit mode
+            function toggleEditMode(edit) {
+                if (edit) {
+                    // Show inputs and hide displays
+                    nameDisplay.classList.add('hidden');
+                    emailDisplay.classList.add('hidden');
+                    // roleDisplay.classList.add('hidden');
+                    
+                    nameInput.classList.remove('hidden');
+                    emailInput.classList.remove('hidden');
+                    // roleInput.classList.remove('hidden');
+                    
+                    // Show save/cancel buttons
+                    editBtn.classList.add('hidden');
+                    saveBtn.classList.remove('hidden');
+                    cancelBtn.classList.remove('hidden');
+                } else {
+                    // Hide inputs and show displays
+                    nameDisplay.classList.remove('hidden');
+                    emailDisplay.classList.remove('hidden');
+                    // roleDisplay.classList.remove('hidden');
+                    
+                    nameInput.classList.add('hidden');
+                    emailInput.classList.add('hidden');
+                    // roleInput.classList.add('hidden');
+                    
+                    // Show edit button
+                    editBtn.classList.remove('hidden');
+                    saveBtn.classList.add('hidden');
+                    cancelBtn.classList.add('hidden');
+                }
+            }
+            
+            // Save changes
+            function saveChanges() {
+                nameDisplay.textContent = nameInput.value;
+                emailDisplay.textContent = emailInput.value;
+                // roleDisplay.textContent = roleInput.value;
+                
+                toggleEditMode(false);
+                
+                // Here you would typically send the data to a server
+                alert('Profile updated successfully!');
+            }
+            
+            // Event Listeners
+            editBtn.addEventListener('click', () => toggleEditMode(true));
+            
+            cancelBtn.addEventListener('click', () => {
+                // Reset inputs to current display values
+                nameInput.value = nameDisplay.textContent;
+                emailInput.value = emailDisplay.textContent;
+                // roleInput.value = roleDisplay.textContent;
+                
+                toggleEditMode(false);
+            });
+            
+            saveBtn.addEventListener('click', saveChanges);
+            
+            editImageBtn.addEventListener('click', function() {
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = 'image/*';
+                
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            profileImage.src = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+                
+                fileInput.click();
+            });
+            
+            // Allow pressing Enter to save in edit mode
+            document.addEventListener('keydown', function(e) {
+                if (!saveBtn.classList.contains('hidden') && e.key === 'Enter') {
+                    saveChanges();
+                }
+            });
+        });
+    </script> -->
+</body>
+</html>
