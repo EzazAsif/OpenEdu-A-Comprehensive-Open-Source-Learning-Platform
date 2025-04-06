@@ -3,13 +3,13 @@ from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import User
+# from .forms import *
 from .accountfuncs import checkvalidity
 from .decorators import log_activity
 from .singleton import UserSingleton
 from .strategies import RegularUserRegistration
 from .observers import UserProfileUpdatedObserver
-from .facade import RegistrationFacade 
-
+from .facade import RegistrationFacade, ProfileManager
 
 
 def home(request):
@@ -66,45 +66,59 @@ def signup(request):
     return render(request, "registration.html")
 
 
-@login_required
-@log_activity  # Apply the decorator to log activity for profile editing
-def edit_profile(request):
-    user = UserSingleton.get_instance(request.user.id)
-    if request.method == "POST":
-        data = request.POST
-        Firstname = data.get('FirstName')
-        Lastname = data.get('LastName')
-        Email = data.get('email')
-        password = data.get('psw')
-        rpassword = data.get('psw-repeat')
-        picture = request.FILES.get('editpp')
+# @login_required
+# @log_activity  # Apply the decorator to log activity for profile editing
+# def edit_profile(request):
+#     user = UserSingleton.get_instance(request.user.id)
+#     if request.method == "POST":
+#         data = request.POST
+#         Firstname = data.get('firstName')
+#         Lastname = data.get('lastName')
+#         Email = data.get('email')
+#         password = data.get('password')
+#         rpassword = data.get('confirmPassword')
+#         picture = request.FILES.get('editpic')
 
-        if password and rpassword:
-            if password == rpassword:
-                user.set_password(password)
-            else:
-                messages.error(request, "Passwords don't match")
+#         if password and rpassword:
+#             if password == rpassword:
+#                 user.set_password(password)
+#             else:
+#                 messages.error(request, "Passwords don't match")
 
-        if Firstname:
-            user.first_name = Firstname
-        if Lastname:
-            user.last_name = Lastname
-        if Email:
-            user.email = Email
-        if picture:
-            user.picture = picture
+#         if Firstname:
+#             user.first_name = Firstname
+#         if Lastname:
+#             user.last_name = Lastname
+#         if Email:
+#             user.email = Email
+#         if picture:
+#             user.picture = picture
 
-        user.save()
+#         user.save()
         
-        # Notify observers about the profile update
-        observer = UserProfileUpdatedObserver()
-        observer.update(request,user)
+#         # Notify observers about the profile update
+#         observer = UserProfileUpdatedObserver()
+#         observer.update(request,user)
 
         
-        return redirect('/')
+#         return redirect('viewprof')
     
-    return render(request, "editprofile.html", context={'users': user})
+#     return render(request, "edit-prof.html", context={'users': user})
 
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        viewprof = ProfileManager.update_profile(
+            user=request.user,
+            data=request.POST,
+            files=request.FILES
+        )
+        if viewprof:
+            return redirect('viewprof')
+        else:
+            return render(request, 'edit-prof.html', {'error': 'Invalid data!'})
+    
+    return render(request, 'edit-prof.html')
 
 @log_activity  # Apply the decorator to log activity for logout
 def logout_view(request):
@@ -117,3 +131,21 @@ def logout_view(request):
 # Views
 def welcome(request):
     return render(request, "welcome.html")
+
+@login_required  # Ensures only logged-in users can access
+def view_prof(request):
+    user = request.user  # Get logged-in user's data
+    return render(request, 'viewprof.html', {'user': user})
+
+# @login_required 
+# def view_prof(request):
+#     current_user = User.objects.get(id = request.user.id)
+#     if request.method == "POST":
+#         data = request.POST
+#         Firstname = data.get('firstName')
+#         Lastname = data.get('lastName')
+#         Email = data.get('email')
+
+
+
+#     return render(request, "viewprof.html")
