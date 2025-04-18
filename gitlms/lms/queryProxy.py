@@ -1,8 +1,8 @@
 from django.core.cache import cache
-from .models import Department
+from .models import *
 from django.contrib.auth.decorators import login_required
 
-class DepartmentCacheProxy:
+class QueryCacheProxy:
     def __init__(self, user):
         self.user = user
     
@@ -19,3 +19,16 @@ class DepartmentCacheProxy:
             cache.set(departments_cache_key, departments, timeout=60*15)  # Cache for 15 minutes
             
         return departments
+    @login_required
+    def get_courses(self,department):
+        # Check if departments are already cached
+        coursess_cache_key = f'department?{department.id}'
+        courses = cache.get(coursess_cache_key)
+        print(courses)
+        if not courses:
+            print("not cached yet")
+            # If departments are not cached, fetch from DB and cache them
+            courses = Course.objects.filter(department=department).order_by('course_name')
+            cache.set(coursess_cache_key, courses, timeout=60*15)  # Cache for 15 minutes
+            
+        return courses

@@ -4,11 +4,11 @@ from django.contrib.auth.decorators import login_required
 from .models import Department,Course,Faculty,Slide,Video,Note
 from django.conf import settings
 from .contentViewers import *
-from .queryProxy import DepartmentCacheProxy
+from .queryProxy import QueryCacheProxy
 
 @login_required
 def departments(request):
-    department_proxy = DepartmentCacheProxy(request.user)
+    department_proxy = QueryCacheProxy(request.user)
     departments = department_proxy.get_departments()  # Fetch departments via the proxy
     
     # Determine the visibility of the modal and button based on the user's role
@@ -41,8 +41,9 @@ def courses(request):
 #for Courses inside a Department
 @login_required
 def deptcourses(request,id):
-    department=Department.objects.get(id=id)
-    courses = Course.objects.filter(department=department).order_by('course_name')
+    course_proxy = QueryCacheProxy(request.user)
+    department = Department.objects.get(id=id)
+    courses = course_proxy.get_courses(department)  # Fetch departments via the pr
     showAddButton=(request.user.role=='master')or(request.user.department==department.id)
     showUpdateCourseModal=(request.user.role=='master')or(request.user.department==department.id)
     showCourseModal=(request.user.role=='master')or(request.user.department==department.id)
